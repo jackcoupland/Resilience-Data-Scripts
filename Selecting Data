@@ -1,0 +1,35 @@
+## Requirements before R: manually switch nominal data with L3 data,
+## and ensure variable names match those in the template. 
+## xlsx package is required.
+## Exclude order column when indexing columns to avoid problems when combining data frames.
+
+clean_data<-function(file,sheet,rows,columns,filename) {
+  
+  ## Reading in as a xlsx file allows greater flexibility with selecting the required data.
+  data<-read.xlsx(file,sheetIndex = sheet,rowIndex = rows,colIndex = columns,header = TRUE)
+  
+  ## Create a character vector of Site names for the data set.
+  ## First vector of which variables to exclude when extracting site name variables.
+  ## It is important that all the column names match those below.
+  variables<-c("Group","Factor","Variable","dir","Sitenum")
+  sites<-names(data[variables!=names(data)])
+  for(i in 1:nrow(data)) {
+    if(data[i,"dir"]==-1 && data[i,"Sitenum"]=="5pt") { 
+      for(j in sites) {
+        data[i,j]<-6-data[i,j]
+      }
+    }
+  }
+  ## Create a folder within the directory that all the data can be loaded to.
+  if (!file.exists("Selected Data")) {
+    dir.create("Selected Data")
+  }
+  ## Changing the directory within the function means you'll have to change it 
+  ## back to run the function again with the next data. 
+  setwd("Selected Data")
+  ## Writing out as a CSV file to help with the merging sites function.
+  write.table(data,filename,sep = ",", na = "")
+  ## If function is successful, the charactor string below should be printed.
+  print("Data ready")
+}
+clean_data("Comoros2010.xlsx",3,9:77,2:17,"Comoros2010.csv")

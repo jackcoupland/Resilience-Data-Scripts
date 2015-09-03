@@ -1,0 +1,22 @@
+## Add Template file into Selected Data folder, ensuring that it's first alphabetically,
+  ## this will ensure that it is read first (important for the merge function)
+## Set Selected Data as working directory.
+combined<-function() {
+    ## lapply reads all the files in wd with the output being a list of data frames.
+  dat<-lapply(dir(),read.csv)
+    ## Common header names amongst all files including template(-Order and priority)
+      ## Stops these columns being repeated for each data frame.
+  variables<-c("Group","Factor","Variable","dir","Sitenum")
+    ## The list is accepted as a vector for the Reduce() function.
+    ## by = variables specifies the columns used for merging.
+    ## all.x/all.y ensures that any unmatched rows are not lost and will be added to the bottom of the 
+      ## data frame and filled with NAs.
+  all<-Reduce(function(x,y) merge(x, y, by = variables, all.x = TRUE, all.y = TRUE, sort = FALSE),dat)
+    ## Order column is not used for merging and is moved out of position, this moves to the first column. 
+  allsorted<-all[,c("Order",names(all)[-6])]
+    ## Rows only found in the template are sent to the bottom of the dataframe when merged.
+      ## order() according to the Order column in the template puts them back.
+  allsorted1<-allsorted[order(allsorted[,"Order"]),]
+  write.table(allsorted1,file = "additional_rows.csv",sep = ",",na = "")
+}
+combined()

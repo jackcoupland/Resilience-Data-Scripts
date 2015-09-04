@@ -17,6 +17,6 @@ combined<-function() {
     ## Rows only found in the template are sent to the bottom of the dataframe when merged.
       ## order() according to the Order column in the template puts them back.
   allsorted1<-allsorted[order(allsorted[,"Order"]),]
-  write.table(allsorted1,file = "additional_rows.csv",sep = ",",na = "")
+  write.table(allsorted1,file = "All.csv",sep = ",",na = "")
 }
 combined()
